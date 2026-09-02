@@ -151,6 +151,7 @@ public class FakeCodec(
             )
         }
         storage.writeTemp(destination, encodedBytes)
+        library.recordTempEncode(destination, source, setting)
         return FullEncodeResult.Encoded(
             bytes = encodedBytes,
             durationMs = DEFAULT_DURATION_MS,

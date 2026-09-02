@@ -3,6 +3,7 @@ package dev.trim.ports
 import dev.trim.model.Metric
 import dev.trim.model.QualityScore
 import dev.trim.model.StorageRef
+import dev.trim.model.TempRef
 
 /**
  * Perceptual scoring. Native XPSNR and libvmaf behind one C ABI that takes planar YUV
@@ -10,8 +11,14 @@ import dev.trim.model.StorageRef
  */
 public interface Scorer {
 
-    /** Scores an encoded sample against its source windows. */
+    /** Scores an encoded sample against its source windows — the search's unit of work. */
     public suspend fun score(request: ScoreRequest): ScoreResult
+
+    /**
+     * Scores a completed encode still sitting in scratch space against its source. This is
+     * the Verifier's unit of work: the file exists but has not been committed anywhere.
+     */
+    public suspend fun scoreFile(request: FileScoreRequest): ScoreResult
 
     /**
      * The best score this source could achieve — its own ceiling. The HeadroomCheck skips
@@ -28,6 +35,21 @@ public data class ScoreRequest(
     /** Every Nth frame: 5 while searching, 3 while verifying (§9). */
     val subsampleEveryNthFrame: Int,
     /** Both sides are scaled to this width before scoring (§9). */
+    val normalisedWidth: Int,
+) {
+    init {
+        require(windows.isNotEmpty()) { "scoring needs at least one window" }
+        require(subsampleEveryNthFrame >= 1) { "subsample must be at least 1" }
+        require(normalisedWidth > 0) { "normalisedWidth must be positive" }
+    }
+}
+
+public data class FileScoreRequest(
+    val source: StorageRef,
+    val encoded: TempRef,
+    val windows: List<FrameWindow>,
+    val metric: Metric,
+    val subsampleEveryNthFrame: Int,
     val normalisedWidth: Int,
 ) {
     init {

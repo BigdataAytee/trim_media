@@ -4,6 +4,7 @@ import dev.trim.model.ColorRange
 import dev.trim.model.EncodeSetting
 import dev.trim.model.Metric
 import dev.trim.model.StorageRef
+import dev.trim.model.TempRef
 import dev.trim.ports.EncodedSample
 
 /**
@@ -124,6 +125,7 @@ public data class SampleInfo(
 public class FakeContentLibrary {
     private val models = mutableMapOf<StorageRef, ContentModel>()
     private val samples = mutableMapOf<String, SampleInfo>()
+    private val tempEncodes = mutableMapOf<String, SampleInfo>()
     private var nextSample = 0
 
     public fun register(ref: StorageRef, model: ContentModel) {
@@ -142,4 +144,11 @@ public class FakeContentLibrary {
     }
 
     public fun sample(handle: EncodedSample): SampleInfo? = samples[handle.value]
+
+    /** What the codec wrote into scratch space, so the Verifier's scorer can read it back. */
+    public fun recordTempEncode(temp: TempRef, source: StorageRef, setting: EncodeSetting) {
+        tempEncodes[temp.value] = SampleInfo(source, setting)
+    }
+
+    public fun tempEncode(temp: TempRef): SampleInfo? = tempEncodes[temp.value]
 }

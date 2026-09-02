@@ -51,6 +51,23 @@ public class FakeScorer(
         )
     }
 
+    override suspend fun scoreFile(request: dev.trim.ports.FileScoreRequest): ScoreResult {
+        if (delayMs > 0) clock.sleep(delayMs)
+        failure?.let { (detail, times) ->
+            if (times > 0) {
+                failure = detail to (times - 1)
+                return ScoreResult.Failed(detail)
+            }
+        }
+        val encode = library.tempEncode(request.encoded)
+            ?: return ScoreResult.Failed("nothing was encoded to ${request.encoded}")
+        calls += ScoreCall(encode.source, request.metric, encode.setting.quality)
+        val model = library.model(encode.source)
+        return ScoreResult.Scored(
+            QualityScore(request.metric, model.scoreAt(encode.setting, request.metric)),
+        )
+    }
+
     override suspend fun ceiling(source: StorageRef, metric: Metric): ScoreResult {
         if (delayMs > 0) clock.sleep(delayMs)
         ceilingCalls += source
