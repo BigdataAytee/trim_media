@@ -196,19 +196,46 @@ Restore refuses in three cases, each with its reason:
 ### §8.2 The delete-immediately warning
 
 Choosing to delete originals immediately is the only irreversible setting in the app. It
-requires a one-time confirmation per folder, and the wording is a **single string
-constant** quoted by this section, by the dialog, and by the tests alike:
+requires a one-time confirmation, and the wording is a **single string constant** per
+scope, quoted by this section, by the dialog, and by the tests alike.
 
-> **Originals will be deleted straight away**
+There are two scopes, because they promise different things and one string cannot say both.
+
+**Per folder** — shown when a folder's original-handling is set to delete. `%s` is the
+folder's display name.
+
+> **Originals in %s will be deleted**
 >
-> Trim will replace each video with a smaller copy and delete the original immediately.
-> There will be nothing to restore. Trim checks every copy before replacing anything, but
-> if you later decide you wanted the original, it will be gone.
+> From now on, when Trim shrinks a video in this folder, it will delete the original
+> immediately. There will be nothing to restore.
 
-Confirm button: **Delete originals**. Cancel button: **Keep originals for 30 days**.
+Actions: **Keep originals** (default focus) · **Delete originals**
+
+**As the default for new folders** — shown when Settings' default original-handling is set
+to delete. It governs folders that do not exist yet, so it says so, and it says the choice
+is still per-folder afterwards.
+
+> **New folders will delete originals**
+>
+> Any folder you add from now on will delete originals immediately after shrinking them.
+> There will be nothing to restore. You can still change this for each folder.
+
+Actions: **Keep originals** (default focus) · **Delete originals**
+
+Three rules govern this copy, and a rewrite that breaks any of them is a regression:
+
+1. **No reassurance in the warning.** Not "Trim checks every copy first", not "most people
+   never restore anything". Both are true; neither is about the risk being consented to,
+   which is solely that the choice cannot be taken back. A reassurance at the moment of
+   irreversible consent is a sales technique, and this dialog is not selling.
+2. **Name the scope, not the instance.** The user is setting a standing policy, not
+   confirming one deletion. "From now on" and the folder's name are load-bearing.
+3. **The safe action is the one in focus**, and neither action is called "Cancel" —
+   both name what they do, so the dialog can be answered without reading it twice.
 
 **[UNSIGNED]** — this wording is invented. It is the most consequential copy in the app and
-the piece most likely to be wrong; it needs a product owner and arguably a lawyer.
+the piece most likely to be wrong; it needs a product owner and arguably a lawyer. The three
+rules above are the part worth arguing about; the sentences are an attempt to satisfy them.
 
 ## §9 Architecture
 

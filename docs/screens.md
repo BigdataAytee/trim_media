@@ -191,8 +191,15 @@ Three `OptionCard`s. The default carries an accent border and a **Default** badg
 | **Move originals to <volume>** | "Originals go to your SD card. Nothing is deleted." |
 | **Delete originals immediately** | "Frees the most space. Nothing to restore." |
 
-Choosing the third opens the confirmation dialog defined in `spec.md` §8.2, once per
-folder. The wording lives in exactly one place, and this feature owns it.
+Choosing the third opens the per-folder confirmation dialog defined in `spec.md` §8.2,
+once per folder. The wording lives in exactly one place and this feature owns it — including
+the copy used by the Settings screen's default, because the delete warning belongs to
+whoever owns the deletion, not to whoever happens to display it.
+
+The dialog names the folder, states that the policy applies from now on, and offers **Keep
+originals** with default focus alongside **Delete originals**. Neither action is called
+"Cancel". It contains no reassurance about how carefully Trim verifies a copy: that is true,
+and it is not what the user is being asked to accept.
 
 ---
 
@@ -246,6 +253,10 @@ A single state; each control observes its own setting.
   phone. This lets it work anyway. It may get warm."
 
 **Originals** — the default for newly added folders; per-folder settings live in Folders.
+Setting this default to "delete immediately" opens the second dialog in `spec.md` §8.2 —
+the one about folders that do not exist yet, which unlike the per-folder dialog does say the
+choice can still be changed per folder, because at this point nothing has been decided about
+any actual folder.
 
 **About**
 - Version
@@ -294,7 +305,9 @@ by line, here is what to review first, in order of consequence:
    whether the app reads as confident or as hedging. "You can free about 12.4 GB" is one
    choice among many.
 2. **The three original-handling option descriptions** (§4). These are how a user decides
-   whether to let an app delete their videos.
+   whether to let an app delete their videos. The delete-immediately warning itself has
+   been through one deliberate rewrite — see `spec.md` §8.2, which now carries the three
+   rules the wording has to satisfy as well as the wording.
 3. **The diagnostics wording** (§6). It tells the user their video names are in the file.
    Getting this wrong is a privacy failure even though nothing is transmitted.
 4. **The pause second-lines** (§2). They are the difference between a paused job reading as
