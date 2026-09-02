@@ -6,12 +6,13 @@ an arm64 device attached. Run `tools/preflight-android.sh` first.
 **Precondition: Milestone 3 must be done.** The calibration harness encodes a ladder of
 real settings and scores every result, so it needs the real Codec.
 
-**Missing document.** The original milestone brief builds the harness "from docs/spec.md
-§12.1". `docs/spec.md` has never been supplied to this repository (see `docs/DECISIONS.md`
-D0.1). app-architecture §9 and §11 specify enough to build it; anything §12.1 would have
-pinned down — exact CSV columns, corpus size, the release-gate threshold — is a judgment
-call to record rather than a fact to look up. If you have `spec.md`, add it to `docs/`
-before starting and this paragraph stops applying.
+**On `spec.md` §12.1.** The original milestone brief builds the harness "from docs/spec.md
+§12.1". `spec.md` was never supplied and now exists only as a Claude-written reconstruction
+(`docs/DECISIONS.md` D0.3). Its §12.1 states the harness's purpose and outputs, which are
+derived from app-architecture §9 and §11 and are reliable — but it marks its own CSV
+columns, ladder spacing and corpus composition **[UNSIGNED]**, because nothing implied
+them. Treat those as a starting proposal to improve on and record, not as a fact to
+implement. If a real `spec.md` arrives, it wins.
 
 ---
 
@@ -73,9 +74,9 @@ just how they get taken.
    results can sit in one file. §11 calls the corpus a release gate, so it will be run by
    someone who is not you, on a device you have never seen.
 
-   Record in DECISIONS what §12.1 would have told us and you had to choose instead: the
-   ladder's settings, how many clips, what counts as enough of them, and what the CSV's
-   columns are.
+   spec.md §12.1 proposes a shape for all of this and marks it [UNSIGNED]. Either adopt its
+   proposal and say so, or improve on it — but record what you settled on in DECISIONS and
+   update §12.1 to match, so the two do not drift.
 
 4. The calibration table stays data, not code (§9). Do not hardcode a threshold to make
    anything pass.

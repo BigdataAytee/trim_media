@@ -5,10 +5,13 @@ Source of truth: `docs/spec.md`, `docs/app-architecture.md`,
 before changing the code it governs. Documents beat instincts; ask the
 human when documents conflict.
 
-> Status: `docs/app-architecture.md` and `docs/frontend-architecture.md` are
-> present. `docs/spec.md` and `docs/screens.md` have **not** been supplied to
-> the repo yet — see `docs/DECISIONS.md`. Anything that would depend on them
-> is either deferred to a later milestone or recorded as a judgment call.
+> Status: `docs/app-architecture.md` and `docs/frontend-architecture.md` are the
+> originals. `docs/spec.md` and `docs/screens.md` were never supplied and are
+> **Claude-written reconstructions** — see the status block at the top of each, and
+> `docs/DECISIONS.md` D0.1. They are proposals until a product owner signs them off.
+> Items marked **[UNSIGNED]** in `spec.md`, and all unmarked copy in `screens.md`,
+> carry no more authority than a `DECISIONS.md` entry. Do not cite them at a human
+> as though they settled a question.
 
 ## Invariants (never violate, never "temporarily" bypass)
 - No network: no INTERNET permission in any merged manifest, no

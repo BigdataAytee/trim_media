@@ -2,16 +2,23 @@
 
 Paste the block below into Claude Code, in a session that has the Android SDK.
 
-**Hard precondition: `docs/screens.md` must exist.** It does not (see `docs/DECISIONS.md`
-D0.1). It is the revised §10 screens document, and it is the only source for what each
-screen actually contains — the copy, the layouts, the states beyond the four
-`frontend-architecture.md` names per screen. Starting without it does not produce a
-partial Milestone 5; it produces an invented one that has to be thrown away when the real
-document arrives. `docs/spec.md` is also missing, and §8 of it is quoted by the
-delete-immediately warning string.
+**Hard precondition: `docs/screens.md` must be signed off by a product owner.**
 
-Add both documents to `docs/` before pasting this. If you genuinely cannot, say so and we
-will scope a smaller milestone deliberately rather than by accident.
+It now exists — but it is a *reconstruction written by Claude*, not the original §10 screens
+document, which was never supplied (`docs/DECISIONS.md` D0.1, D0.3). Its structure is
+derived from `frontend-architecture.md` §5 and is sound. **Nearly all of its copy is
+invented**, and copy is most of what a screens document is for.
+
+This precondition is therefore not "the file exists". A session that opens `screens.md`,
+sees a complete-looking document and builds against it will ship Claude's guesses as the
+product's voice — which is exactly the outcome the original version of this precondition
+existed to prevent. The file existing makes that mistake *easier*, not harder.
+
+Before pasting this prompt, have a human read `screens.md` and at minimum settle the five
+items its appendix lists as most consequential: the headline card, the three
+original-handling descriptions, the diagnostics wording, the pause second-lines, and the
+empty states. The same applies to `spec.md` §8.2, whose delete-immediately warning is
+quoted by this milestone and is marked **[UNSIGNED]**.
 
 **Precondition: Milestones 2–4 done.** The real variant wires to the real pipeline last,
 so it needs one.
@@ -20,7 +27,10 @@ so it needs one.
 
 ```
 Read docs/frontend-architecture.md in full, docs/screens.md in full, docs/spec.md §8,
-CLAUDE.md and docs/DECISIONS.md (D2.1, D2.2, D2.5, D2.5b, D8.7) before writing any code.
+CLAUDE.md and docs/DECISIONS.md (D0.3, D2.1, D2.2, D2.5, D2.5b, D8.7) before writing any
+code. Note that spec.md and screens.md are reconstructions rather than originals: strings
+marked ‹coded› in screens.md are already committed to and tested, and everything else in it
+is a draft you should expect to be corrected.
 These documents are the source of truth. Where they conflict with your instincts, the
 documents win. Where they conflict with each other, ask me.
 
@@ -154,7 +164,9 @@ to question.
 ## Bring these to me rather than deciding them
 
 - Anything screens.md does not cover. Inventing screen content is the one failure mode
-  this milestone has, and it is invisible until someone reads the result.
+  this milestone has, and it is invisible until someone reads the result. This applies
+  doubly now that screens.md is itself partly invented — do not build on a draft string
+  and then treat it as settled because it was in a file.
 - Any urge to compute a number in a ViewModel.
 - Any screen whose design is hard because a type will not lie.
 

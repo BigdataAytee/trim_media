@@ -65,15 +65,17 @@ three remaining build guards are live, and the `androidApp` module is blocked on
 environment with access to the Android SDK. `docs/M2-STATUS.md` is the handoff;
 `tools/preflight-android.sh` says in one command whether a machine can build it.
 
-## Missing documents
+## Two documents are reconstructions
 
-`docs/spec.md` and `docs/screens.md` are named as sources of truth by `CLAUDE.md` but have
-not been supplied to the repo. Nothing in Milestones 1–3 depended on them; everywhere a
-value would normally have come from the spec, a default was chosen and recorded in
-`docs/DECISIONS.md` under D0 and D3.
+`docs/app-architecture.md` and `docs/frontend-architecture.md` are the originals.
+`docs/spec.md` and `docs/screens.md` were never supplied and have been **written by Claude**
+from what the other documents and the built code imply. Each carries a status block saying
+so.
 
-They become blocking later. Milestone 4's calibration harness is specified in `spec.md`
-§12.1, and enough of it can be rebuilt from `app-architecture.md` §9 and §11 that the
-milestone can proceed with its choices recorded. **Milestone 5 cannot.** `screens.md` is
-the only source for what each screen contains, and starting without it produces an
-invented UI rather than a partial one — see `docs/M5-PROMPT.md`.
+Much of both is derived — it writes down decisions that are already coded and tested. The
+rest is invented, and marked: **[UNSIGNED]** in `spec.md`, and everything not marked
+**‹coded›** in `screens.md`, which is nearly all of its copy. Both end with an appendix
+listing what to review first.
+
+They are proposals, not authority. Milestone 5 in particular should not start until the
+screens copy has a product owner behind it.

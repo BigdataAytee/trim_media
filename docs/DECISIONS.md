@@ -7,7 +7,8 @@ correction by the human — it is a log of judgment calls, not of agreed policy.
 ## D0 — Documents and inputs
 
 - D0.1 — Only `docs/app-architecture.md` and `docs/frontend-architecture.md` were supplied; `docs/spec.md` and `docs/screens.md` are absent, so Milestone 1 was built from app-architecture (complete) plus frontend-architecture §4.2 (the honest types). Anything Milestone 1 needed from `spec.md` (concrete thresholds, retention defaults, copy strings) is recorded below as a chosen default to be reconciled when the spec lands.
-- D0.2 — `spec.md §12.1` (calibration harness) and `spec.md §8` (delete warning copy) are referenced by later milestones only, so their absence does not block M1.
+- D0.2 — `spec.md §12.1` (calibration harness) and `spec.md §8` (delete warning copy) are referenced by later milestones only, so their absence did not block M1.
+- D0.3 — `docs/spec.md` and `docs/screens.md` now exist as **Claude-written reconstructions**, at the human's request, assembled from the two original architecture documents, the built code and this log. They are proposals: `spec.md` marks invented decisions **[UNSIGNED]**, `screens.md` marks already-coded strings **‹coded›** and treats everything else as draft, and both end with an appendix listing what to review first. The hazard they introduce is that a reconstructed spec launders guesses into authority — the marks and this entry exist to keep the guesses visible, and `CLAUDE.md` tells future sessions not to cite an unsigned line at a human as settled.
 
 ## D1 — Build and modules
 
