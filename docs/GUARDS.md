@@ -8,7 +8,7 @@ that silently passes is a guard that silently died.
 |---|---|---|
 | #1a no networking API in any source set | `guardNoNetworkSources` | **live**, wired into `check` |
 | #1b no `INTERNET` in any merged manifest | `guardNoNetworkManifest` | stub, fails loudly. TODO(M2) |
-| #2 codecs only via `CodecFactory` | `guardCodecFactoryOnly` | stub, fails loudly. TODO(M3) |
+| #2 codecs only via `CodecFactory` | `guardCodecFactoryOnly` | **live**, wired into `check` |
 | #3 user storage written only by the Replacer | `guardStorageWrites` | **live**, wired into `check` |
 
 Guard #1 is **two tasks, not one**. Its two obligations have different requirements: the
@@ -125,6 +125,48 @@ Execution failed for task ':guardNoNetworkSources'.
   cannot fail is not a guard (app-architecture §8).
 ```
 
+## Guard #2 is real, demonstrated
+
+Live before the code it polices exists, deliberately: it is the M3 Codec work's seatbelt,
+and a seatbelt fitted afterwards protects nobody. It bans the platform codec APIs, Media3's
+own codec selection (which would route around the factory), and every software transcoder —
+§12 says a file the hardware cannot handle is skipped with a reason, so there is no fallback
+to import and importing one is always a mistake.
+
+```
+$ ./gradlew guardCodecFactoryOnly
+guardCodecFactoryOnly: 13 banned reference(s), 63 source file(s) policed, no violations.
+```
+
+**Failing on a deliberate violation**, since removed:
+
+```kotlin
+import android.media.MediaCodec
+
+internal object QuickEncode {
+    fun encoder(): MediaCodec = MediaCodec.createEncoderByType("video/hevc")
+}
+```
+
+```
+$ ./gradlew guardCodecFactoryOnly
+* What went wrong:
+Execution failed for task ':guardCodecFactoryOnly'.
+> Hardware codecs are obtained ONLY via CodecFactory (CLAUDE.md invariant, app-architecture
+  §8 guard #2). The hardware-only rule is one lint check, not N call-site reviews — and
+  there is no software encoder fallback to fall back to: a file the hardware cannot handle
+  is skipped with a reason (§12).
+
+  2 violation(s):
+    .../pipeline/encode/QuickEncode.kt:3: imports android.media.MediaCodec
+      (banned: android.media.MediaCodec)
+    .../pipeline/encode/QuickEncode.kt:7: references MediaCodec.createEncoderByType
+```
+
+The guard's single allow-list entry is `androidApp/src/main/kotlin/dev/trim/android/codec/`.
+That directory does not exist yet; when `androidApp` adds `CodecFactory`, that is the path
+it must live at.
+
 ## The stubs fail loudly
 
 ```
@@ -141,8 +183,8 @@ Execution failed for task ':guardNoNetwork'.
   This task exists so the guard cannot be forgotten. It fails on purpose.
 ```
 
-They are deliberately **not** wired into `check`, so the build stays green; running one is
-how you find out it is still a stub.
+Only `guardNoNetworkManifest` remains a stub. It is deliberately **not** wired into
+`check`, so the build stays green; running it is how you find out it is still a stub.
 
 ## The exemptions, in full
 
@@ -155,6 +197,7 @@ here as well as in the build script.
 | #3 | `…/pipeline/replace/` | the Replacer and the Restorer — the package §6 permits |
 | #3 | `…/contract/StorageContract.kt` | exercising the write methods *is* its purpose; a contract test for a write that may not call the write tests nothing. Deliberately one **file**, not the module — the other contracts do not touch user storage and must not start |
 | #1a | *(none)* | nothing in this repository may reference a networking API |
+| #2 | `androidApp/…/android/codec/` | the future home of `CodecFactory`, the one place permitted to touch the platform codec APIs |
 
 ## Two things the Replacer's package contains
 

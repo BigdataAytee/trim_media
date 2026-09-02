@@ -57,7 +57,8 @@ human when documents conflict.
   with no Android SDK.
 - **M2 (in progress)** — `androidApp` + real MediaInfo/Storage/Scheduler ports, guards #1
   and #2. Done so far: `core/ports-contract` (one shared suite per port, passing against
-  every fake) and guard #1a (`guardNoNetworkSources`, live). Blocked in the current
+  every fake), guard #1a (`guardNoNetworkSources`) and guard #2
+  (`guardCodecFactoryOnly`), both live and wired into `check`. Blocked in the current
   container: `dl.google.com` is denied by egress policy, so the Android SDK, AGP and every
   androidx artifact are unreachable, and there is no `/dev/kvm` for an emulator. The
   `androidApp` module needs an environment with those.

@@ -118,20 +118,62 @@ tasks.register<PendingGuardTask>("guardNoNetworkManifest") {
     )
 }
 
-tasks.register<PendingGuardTask>("guardCodecFactoryOnly") {
+// ---- guard #2 ----
+//
+// Live now, before the code it polices exists, and deliberately so: it is the M3 Codec
+// work's seatbelt, and a seatbelt fitted afterwards protects nobody. Today it scans the
+// shared modules and finds nothing, which is a pass and not a no-op — it has a ban list and
+// sources to scan, which is what §8 requires of a guard that reports success.
+
+val guardCodecFactoryOnly = tasks.register<BannedImportGuardTask>("guardCodecFactoryOnly") {
     group = "verification"
-    description = "Guard #2 (stub): codecs obtained only via CodecFactory. TODO(M3)."
-    guardName.set("codec-factory-only")
-    milestone.set("M3")
-    rationale.set(
-        "Guard #2 bans direct MediaCodec instantiation and software-encoder imports outside " +
-            "CodecFactory. Milestone 1 has no MediaCodec code at all — the Codec port is " +
-            "backed only by fakes — so there is nothing to police yet."
+    description = "Guard #2: hardware codecs are obtained only via CodecFactory."
+
+    scannedSources.from(policedSources())
+    allowedPathFragments.set(
+        listOf(
+            // The one place permitted to touch the platform codec APIs. It does not exist
+            // yet; when androidApp adds it, this is the path it must live at.
+            "androidApp/src/main/kotlin/dev/trim/android/codec/",
+        )
     )
+    bannedImportPrefixes.set(
+        listOf(
+            // The platform codec APIs: allowed only behind CodecFactory.
+            "android.media.MediaCodec",
+            "android.media.MediaCodecList",
+            "android.media.MediaCodecInfo",
+            // Media3/ExoPlayer's own codec selection, which would route around the factory.
+            "androidx.media3.transformer.Codec",
+            "androidx.media3.exoplayer.mediacodec",
+            // Software encoders. app-architecture §12: a file the hardware cannot handle is
+            // skipped with a reason, never ground out on the CPU. There is no fallback to
+            // import, so importing one is always a mistake.
+            "org.jcodec",
+            "com.arthenica.ffmpegkit",
+            "com.arthenica.mobileffmpeg",
+            "net.ypresto.androidtranscoder",
+            "com.otaliastudios.transcoder",
+        )
+    )
+    bannedSymbols.set(
+        listOf(
+            // Direct instantiation, which an import ban alone would miss when the class is
+            // referenced by its fully-qualified name.
+            "MediaCodec.createEncoderByType",
+            "MediaCodec.createDecoderByType",
+            "MediaCodec.createByCodecName",
+        )
+    )
+    rationale.set(
+        "Hardware codecs are obtained ONLY via CodecFactory (CLAUDE.md invariant, " +
+            "app-architecture §8 guard #2). The hardware-only rule is one lint check, not N " +
+            "call-site reviews — and there is no software encoder fallback to fall back to: " +
+            "a file the hardware cannot handle is skipped with a reason (§12)."
+    )
+    report.set(layout.buildDirectory.file("reports/guards/codec-factory-only.txt"))
 }
 
-// `check` is registered by the root build script after this plugin is applied, so bind
-// lazily rather than with tasks.named(...).
 tasks.matching { it.name == "check" }.configureEach {
-    dependsOn(guardStorageWrites, guardNoNetworkSources)
+    dependsOn(guardStorageWrites, guardNoNetworkSources, guardCodecFactoryOnly)
 }
