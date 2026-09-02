@@ -31,8 +31,15 @@ val guardStorageWrites = tasks.register<StorageWriteGuardTask>("guardStorageWrit
         listOf(
             // The port declaration itself.
             "shared/core/ports/",
-            // The one class permitted to write (app-architecture §6).
+            // The package permitted to write (app-architecture §6): the Replacer and its
+            // mirror image, the Restorer.
             "core/pipeline/src/commonMain/kotlin/dev/trim/pipeline/replace/",
+            // The Storage port's own contract suite. It is exempt because exercising the
+            // write methods IS its purpose — a contract test for a write that may not call
+            // the write would be a contract test of nothing. Deliberately one FILE, not the
+            // module: the other contracts do not touch user storage and must not start.
+            "core/ports-contract/src/commonMain/kotlin/dev/trim/ports/contract/" +
+                "StorageContract.kt",
         )
     )
     report.set(layout.buildDirectory.file("reports/guards/storage-writes.txt"))

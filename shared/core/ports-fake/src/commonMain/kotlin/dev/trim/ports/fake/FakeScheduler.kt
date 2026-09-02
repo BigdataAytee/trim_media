@@ -26,6 +26,8 @@ public class FakeScheduler(
         nightlyConstraints = null
     }
 
+    override suspend fun isNightlyScheduled(): Boolean = nightlyConstraints != null
+
     override suspend fun runNow(jobs: List<JobId>) {
         runNowCalls += jobs
     }

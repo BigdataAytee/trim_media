@@ -121,9 +121,12 @@ public class FakeCodec(
                 return FullEncodeResult.Failed(error)
             }
         }
-        val model = library.model(source)
+        // Existence first: a source that has gone is a named failure, not an exception.
+        // The Codec contract has a clause for exactly this, because the runner has to be
+        // able to record an outcome for a file that vanished mid-job.
         val sourceBytes = storage.sizeBytes(source)
             ?: return FullEncodeResult.Failed(CodecError.SourceChanged)
+        val model = library.model(source)
 
         var fraction = 0.0
         while (fraction < 1.0) {

@@ -14,6 +14,17 @@ public interface Scheduler {
 
     public suspend fun cancelNightly()
 
+    /**
+     * Whether nightly work is currently scheduled.
+     *
+     * This exists so the port has a contract that can be tested at all: an interface whose
+     * every method returns Unit has no observable behaviour, and a "contract test" for it
+     * could only assert that nothing threw. The Android implementation answers it from
+     * WorkManager's own work-info query rather than from a flag it keeps itself
+     * (DECISIONS D9.2).
+     */
+    public suspend fun isNightlyScheduled(): Boolean
+
     /** Asks the OS to run these jobs now; used by the explicit-tap path. */
     public suspend fun runNow(jobs: List<JobId>)
 
