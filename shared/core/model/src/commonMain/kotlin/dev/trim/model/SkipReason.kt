@@ -8,10 +8,7 @@ package dev.trim.model
  * The five reasons of frontend-architecture §4.2 plus the two that app-architecture §3
  * requires the HeadroomCheck and Prober stages to be able to emit. See DECISIONS D2.1.
  */
-public sealed interface SkipReason {
-
-    /** One sentence, sentence case, no codes. Rendered verbatim by SkippedRow. */
-    public val displayText: String
+public sealed interface SkipReason : RejectionReason {
 
     /** Already close enough to the efficiency frontier that shrinking it would cost quality. */
     public data class AlreadyEfficient(

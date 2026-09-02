@@ -55,10 +55,14 @@ public sealed interface CompressPhase {
         val result: CompressionResult,
     ) : CompressPhase
 
-    /** Not compressed, with the reason. */
+    /**
+     * Not compressed, with the reason — an expected skip or a file-level failure. Both
+     * land in History's skipped list (app-architecture §10), and both carry plain-language
+     * text, which is the only thing [RejectionReason] promises.
+     */
     public data class Rejected(
         override val videoId: VideoId,
-        val reason: SkipReason,
+        val reason: RejectionReason,
     ) : CompressPhase
 }
 

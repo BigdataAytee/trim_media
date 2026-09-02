@@ -23,11 +23,9 @@ public enum class FailureKind {
  * appear here; retryable interruptions are [PauseReason]s and never appear here either.
  * Keeping the three sets disjoint is what makes the runner's `when` blocks readable.
  */
-public sealed interface FailureReason {
+public sealed interface FailureReason : RejectionReason {
 
     public val kind: FailureKind
-
-    public val displayText: String
 
     /** The encode finished but did not meet the verifier's bar. */
     public data class VerificationFailed(val detail: VerificationFailure) : FailureReason {

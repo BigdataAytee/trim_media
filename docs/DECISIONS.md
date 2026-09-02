@@ -23,6 +23,7 @@ correction by the human — it is a log of judgment calls, not of agreed policy.
 - D2.2 — `EstimateRange` carries `lowBytes <= highBytes` as a constructor `require`, plus an `EstimateConfidence` of `SEED`/`PREDICTED`/`PROBED`; frontend-architecture §4.2 names the field `confidence` without giving its type.
 - D2.3 — `QualityScore` is a value class over a `Double` in `0.0..100.0` tagged with its `Metric` (`XPSNR` or `VMAF`), so an XPSNR value can never be compared against a VMAF threshold by accident.
 - D2.4 — Encoder settings are modelled as a **quality index** (`EncodeSetting.quality`, a CRF-like integer where higher is more aggressive) rather than a bitrate, because app-architecture §3 searches CRF and §12/M3 flags CQ-vs-bitrate mode as an open per-device risk. The index is the search variable; mapping it to a device's actual rate-control mode is M3's job.
+- D2.5b — `SkipReason` and `FailureReason` share one supertype, `RejectionReason`, carrying nothing but `displayText`. `CompressPhase.Rejected` takes that supertype because app-architecture §10 puts expected skips *and* file-level failures in History's skipped list, while frontend-architecture §4.2 names only `SkipReason`. The two sets stay disjoint; only their user-facing obligation is shared.
 - D2.5 — `OriginalFate.KeptDays(n)` requires `n >= 1`; a retention of zero days is `Deleted`, which is a different user-visible message.
 
 ## D3 — Triage policy
