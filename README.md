@@ -9,7 +9,7 @@ running and tested on the JVM against fake platform ports, with zero Android
 dependencies.
 
 ```
-./gradlew check      # 122 tests, passes on a machine with no Android SDK
+./gradlew check      # 130 tests, passes on a machine with no Android SDK
 ```
 
 ## Layout
@@ -20,6 +20,7 @@ dependencies.
 | `shared/core/model` | entities and the honest types (`EstimateRange`, `SkipReason`, …) |
 | `shared/core/ports` | the seven platform ports |
 | `shared/core/ports-fake` | one scriptable fake per port |
+| `shared/core/ports-contract` | one shared contract suite per port, run against fake and real alike |
 | `shared/core/pipeline` | the pipeline stages and the job runner |
 | `shared/core/data` | SQLDelight schema, DAOs, startup reconciler |
 | `shared/core/domain` | the frontend↔pipeline contract |

@@ -1,3 +1,4 @@
+import trim.guards.BannedImportGuardTask
 import trim.guards.PendingGuardTask
 import trim.guards.StorageWriteGuardTask
 
@@ -6,6 +7,17 @@ import trim.guards.StorageWriteGuardTask
 // registered as loudly-failing stubs.
 
 val repoRoot = rootProject.layout.projectDirectory
+
+/**
+ * Every production Kotlin source in the build, derived from the modules the build actually
+ * has — so a module added later is policed automatically rather than quietly exempt. Source
+ * directories only, never a tree rooted above a module's `build/`.
+ */
+fun policedSources(): List<Any> = subprojects.map { module ->
+    module.layout.projectDirectory.dir("src").asFileTree.matching {
+        include("**/*Main/kotlin/**/*.kt")
+    }
+}
 
 val guardStorageWrites = tasks.register<StorageWriteGuardTask>("guardStorageWrites") {
     group = "verification"
@@ -18,15 +30,7 @@ val guardStorageWrites = tasks.register<StorageWriteGuardTask>("guardStorageWrit
     portSources.from(
         repoRoot.dir("shared/core/ports/src").asFileTree.matching { include("**/*.kt") }
     )
-    scannedSources.from(
-        // Derived from the modules the build actually has, so a module added later is
-        // policed automatically rather than quietly exempt.
-        subprojects.map { module ->
-            module.layout.projectDirectory.dir("src").asFileTree.matching {
-                include("**/*Main/kotlin/**/*.kt")
-            }
-        }
-    )
+    scannedSources.from(policedSources())
     allowedPathFragments.set(
         listOf(
             // The port declaration itself.
@@ -45,16 +49,72 @@ val guardStorageWrites = tasks.register<StorageWriteGuardTask>("guardStorageWrit
     report.set(layout.buildDirectory.file("reports/guards/storage-writes.txt"))
 }
 
-tasks.register<PendingGuardTask>("guardNoNetwork") {
+// ---- guard #1, in two halves ----
+//
+// §8's guard #1 has two obligations: no INTERNET permission in any variant's merged
+// manifest, and no networking API referenced in any source set. The second is a source scan
+// and is live now; the first needs the Android Gradle Plugin to produce a merged manifest
+// and stays a loud stub. They are two named tasks rather than one, so that "guard #1
+// passes" can never come to mean "half of guard #1 passes".
+
+val guardNoNetworkSources = tasks.register<BannedImportGuardTask>("guardNoNetworkSources") {
     group = "verification"
-    description = "Guard #1 (stub): no INTERNET permission, no networking API. TODO(M2)."
-    guardName.set("no-network")
+    description = "Guard #1a: no networking API is referenced in any source set."
+
+    scannedSources.from(policedSources())
+    allowedPathFragments.set(emptyList<String>())
+    bannedImportPrefixes.set(
+        listOf(
+            // JDK
+            "java.net",
+            "javax.net",
+            "java.rmi",
+            // Android
+            "android.net",
+            "android.webkit",
+            // Kotlin / JetBrains
+            "io.ktor",
+            // The usual third parties, banned by name so a stray dependency is obvious.
+            // §8 notes this guard "already caught a third-party dependency silently
+            // contributing the permission" — the source half is where the import shows up.
+            "okhttp3",
+            "retrofit2",
+            "com.squareup.okhttp",
+            "org.apache.http",
+            "com.android.volley",
+            "com.google.firebase",
+            "com.google.android.gms",
+        )
+    )
+    bannedSymbols.set(
+        listOf(
+            "HttpURLConnection",
+            "URLConnection",
+            "InetAddress",
+            "DatagramSocket",
+            "ServerSocket(",
+        )
+    )
+    rationale.set(
+        "Trim has no network layer to be misused — not disabled, absent, and build-verified " +
+            "absent (app-architecture §12). The privacy claim in the store listing is " +
+            "literally compile-checked, so a networking reference in any source set is a " +
+            "broken promise to the user, not a style violation."
+    )
+    report.set(layout.buildDirectory.file("reports/guards/no-network-sources.txt"))
+}
+
+tasks.register<PendingGuardTask>("guardNoNetworkManifest") {
+    group = "verification"
+    description = "Guard #1b (stub): no INTERNET permission in any merged manifest. TODO(M2)."
+    guardName.set("no-network-manifest")
     milestone.set("M2")
     rationale.set(
-        "Guard #1 checks the MERGED manifest of every Android variant and bans networking " +
-            "imports in every source set. Milestone 1 has no androidApp and no merged " +
-            "manifest to check, so implementing it now would give a guard with nothing to " +
-            "scan — which §8 says must fail rather than pass."
+        "The other half of guard #1 — guardNoNetworkSources — is live and wired into `check`. " +
+            "This half checks the MERGED manifest of every Android variant, which is where a " +
+            "third-party dependency silently contributing INTERNET shows up and where a " +
+            "source scan cannot look. It needs the Android Gradle Plugin, so it lands with " +
+            "androidApp."
     )
 }
 
@@ -73,5 +133,5 @@ tasks.register<PendingGuardTask>("guardCodecFactoryOnly") {
 // `check` is registered by the root build script after this plugin is applied, so bind
 // lazily rather than with tasks.named(...).
 tasks.matching { it.name == "check" }.configureEach {
-    dependsOn(guardStorageWrites)
+    dependsOn(guardStorageWrites, guardNoNetworkSources)
 }

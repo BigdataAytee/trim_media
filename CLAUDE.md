@@ -31,9 +31,10 @@ human when documents conflict.
 - Dependency direction: presentation → domain → pipeline → ports.
   Nothing above ports imports a platform class. `core/*` stays pure Kotlin,
   JVM-testable.
-- Every port has one fake; fakes are scriptable (delays, failures).
-  New platform capability = new port + fake + contract test, not an
-  Android import in shared code.
+- Every port has one fake and one contract suite in `core/ports-contract`.
+  Fakes are scriptable (delays, failures). New platform capability = new
+  port + fake + contract suite, not an Android import in shared code. A real
+  implementation is finished when it passes the same suite as its fake.
 - Sealed results for anything that can fail; exhaustive `when`, no `else`
   branches on domain sealed types.
 - One hardware encode at a time; scoring of file N−1 may overlap the
@@ -54,7 +55,12 @@ human when documents conflict.
   `core/pipeline`, `core/data`, `core/domain`, `buildLogic`. No Android,
   Compose, MediaCodec or JNI code. `./gradlew check` must pass on a machine
   with no Android SDK.
-- M2 — `androidApp` + real MediaInfo/Storage/Scheduler ports, guards #1 and #2.
+- **M2 (in progress)** — `androidApp` + real MediaInfo/Storage/Scheduler ports, guards #1
+  and #2. Done so far: `core/ports-contract` (one shared suite per port, passing against
+  every fake) and guard #1a (`guardNoNetworkSources`, live). Blocked in the current
+  container: `dl.google.com` is denied by egress policy, so the Android SDK, AGP and every
+  androidx artifact are unreachable, and there is no `/dev/kvm` for an emulator. The
+  `androidApp` module needs an environment with those.
 - M3 — real Codec port (Media3 / MediaCodec).
 - M4 — real Scorer (XPSNR + libvmaf) + calibration harness.
 - M5 — UI per `docs/frontend-architecture.md` and `docs/screens.md`.
