@@ -55,6 +55,13 @@ see `CLAUDE.md`.
 4. `docs/GUARDS.md` — the build-enforced invariants, and the evidence they are alive.
 5. `docs/DECISIONS.md` — every judgment call made where the documents were silent.
 
+## Where the build is now
+
+Milestone 1 is complete. Milestone 2 is partly done: the contract suites and two of the
+three remaining build guards are live, and the `androidApp` module is blocked on an
+environment with access to the Android SDK. `docs/M2-STATUS.md` is the handoff;
+`tools/preflight-android.sh` says in one command whether a machine can build it.
+
 ## Missing documents
 
 `docs/spec.md` and `docs/screens.md` are named as sources of truth by `CLAUDE.md` but have

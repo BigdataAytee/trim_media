@@ -60,8 +60,10 @@ human when documents conflict.
   every fake), guard #1a (`guardNoNetworkSources`) and guard #2
   (`guardCodecFactoryOnly`), both live and wired into `check`. Blocked in the current
   container: `dl.google.com` is denied by egress policy, so the Android SDK, AGP and every
-  androidx artifact are unreachable, and there is no `/dev/kvm` for an emulator. The
-  `androidApp` module needs an environment with those.
+  androidx artifact are unreachable, and there is no `/dev/kvm` for an emulator.
+  **Run `tools/preflight-android.sh` before starting Android work**, and read
+  `docs/M2-STATUS.md` — it records what is done, what is left, and where each remaining
+  piece plugs in.
 - M3 — real Codec port (Media3 / MediaCodec).
 - M4 — real Scorer (XPSNR + libvmaf) + calibration harness.
 - M5 — UI per `docs/frontend-architecture.md` and `docs/screens.md`.
