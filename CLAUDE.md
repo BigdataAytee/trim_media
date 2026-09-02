@@ -64,7 +64,7 @@ human when documents conflict.
   **Run `tools/preflight-android.sh` before starting Android work**, and read
   `docs/M2-STATUS.md` — it records what is done, what is left, and where each remaining
   piece plugs in.
-- M3 — real Codec port (Media3 / MediaCodec).
+- M3 — real Codec port (Media3 / MediaCodec). Kickoff prompt: `docs/M3-PROMPT.md`.
 - M4 — real Scorer (XPSNR + libvmaf) + calibration harness.
 - M5 — UI per `docs/frontend-architecture.md` and `docs/screens.md`.
 
