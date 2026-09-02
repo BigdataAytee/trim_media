@@ -1,4 +1,10 @@
-# Milestone 6 kickoff prompt — release preparation
+# Release preparation checklist (derived — not a milestone)
+
+> **Not a milestone.** The playbook (`docs/trim-claude-code-prompts.md`) has no Milestone 6;
+> this was derived from app-architecture §11 and §12 (DECISIONS D10.13). The final milestone
+> of the documented plan is M5. It is kept because §11's two release gates are real
+> requirements, but nothing here was specified by the product owner, and it should not be
+> run as though it were.
 
 Paste the block below into Claude Code, in a session that has the Android SDK and a device.
 

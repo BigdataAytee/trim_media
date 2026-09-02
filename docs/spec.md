@@ -285,7 +285,9 @@ It is an instrumented run that:
    bitrates;
 2. encodes each clip at a ladder of settings across the search bracket;
 3. scores every result with **both** metrics, at search subsampling;
-4. writes a CSV of `(device, clip, setting, xpsnr, vmaf)`.
+4. writes a CSV of `(clip, setting, xpsnr, vmaf)` — exactly these four columns, per the
+   original brief (`trim-claude-code-prompts.md`, Milestone 4). Device identity goes in the
+   file name or a header line, never a fifth column.
 
 The output is a per-device-class curve mapping a VMAF target to the XPSNR value that stands
 in for it. Requirements:
@@ -294,11 +296,13 @@ in for it. Requirements:
   updatable without touching the native layer.
 - A device with no calibration falls back to a generic curve and **says so loudly** in
   diagnostics. Silence would mean shipping a guess that looks like a measurement.
-- The CSV appends and carries a device column, so two phones' results sit in one file. It
-  will be run by someone who is not its author, on hardware they have never seen.
+- The CSV appends. Two phones' results stay distinguishable by file name or header rather
+  than by an extra column, because the brief fixes the columns. It will be run by someone
+  who is not its author, on hardware they have never seen.
 
-**[UNSIGNED]** — the CSV columns, the ladder's spacing, the corpus composition and how many
-clips constitute enough are all invented here. The architecture document specifies the
+**[UNSIGNED]** — the ladder's spacing, the corpus composition and how many clips constitute
+enough are invented here. The CSV's four columns are **not** invented: they are fixed by the
+original brief (DECISIONS D10.7). The architecture document specifies the
 harness's purpose and outputs but not its shape.
 
 ## §13 Release criteria

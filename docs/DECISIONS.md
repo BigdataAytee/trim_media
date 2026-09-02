@@ -95,3 +95,85 @@ correction by the human — it is a log of judgment calls, not of agreed policy.
 - D9.9 — Guard #2 bans Media3's own codec-selection APIs (`androidx.media3.transformer.Codec`, `androidx.media3.exoplayer.mediacodec`) alongside `android.media.MediaCodec`. Media3 is the intended M3 implementation, and letting it choose codecs directly would route around `CodecFactory` while looking like ordinary library use.
 - D9.10 — Guard #1a bans the networking classes of `android.net` individually rather than the package. `android.net.Uri` is a URI parser and SAF is built on it, so a package-wide ban would block the Milestone 2 Storage port and invite a blanket exemption that would stop policing Android sources altogether. Verified both directions: `android.net.Uri` passes, `android.net.ConnectivityManager` fails.
 - D9.7 — `guardStorageWrites` exempts `StorageContract.kt` by **file**, not by module: exercising the write methods is that file's purpose, and the other contracts in the module must not acquire the same licence by association.
+
+## D10 — Step 0: reconstructed prompts diffed against the original playbook
+
+The original playbook now lives at `docs/trim-claude-code-prompts.md`. Every difference
+between its Part D briefs and the M2–M6 prompts reconstructed in `docs/M*-PROMPT.md` is
+below, with its resolution. **The original brief wins wherever the two conflict.**
+
+One finding governs all the others: **the original briefs contain no explicit definitions of
+done.** Part B (M1) has one; the Part D briefs for M2–M5 are a paragraph each, and their
+sentences *are* the requirement. The DoD lists in the reconstructed prompts are therefore a
+*reading* of those paragraphs, not the bar the human set. They are retained as working
+checklists, but where a reconstructed DoD adds a requirement the brief does not state, it is
+an addition and not a gate — a milestone is done when the brief's sentences are satisfied.
+
+### M2
+
+- D10.1 — **Conflict, original wins.** The brief defines guard #1 as "no-network on the
+  **merged manifest of every variant**", full stop. The reconstruction split it into
+  `guardNoNetworkSources` (shipped) and `guardNoNetworkManifest` (stub). The split is not a
+  contradiction, but the shipped half does **not** satisfy the brief: M2's guard #1 is the
+  manifest check, and it is outstanding. `guardNoNetworkSources` is retained as an extra and
+  is explicitly not a substitute.
+- D10.2 — Addition, retained. The brief never mentions `androidTarget()`, the SQLDelight
+  Android driver, or keeping `./gradlew jvmTest` green without a device. All three are
+  mechanically required by "create androidApp"; the third preserves what D1.1 spent.
+- D10.3 — Deviation, retained with cause. `Scheduler.isNightlyScheduled()` was added to the
+  port; the brief does not ask for it. It is required *by* the brief's own words — "each
+  passing the same contract-test suite as its fake" — because a port whose every method
+  returns `Unit` has no contract a suite can test beyond "nothing threw".
+
+### M3
+
+- D10.4 — **Conflict, original wins, and it makes shipped code a defect.** The brief requires
+  "KEY_PRIORITY=1 with **catch-wait-resume** on codec reclaim". `JobRunner.encodeWithRetries`
+  currently calls `encoder.encode(...)` again from the top, re-encoding the whole file.
+  `M3-PROMPT.md` framed closing that gap as a proposal to bring to the human; the brief
+  settles it. M3 must implement resume from the last sync point, and the port change that
+  needs is required rather than optional.
+- D10.5 — Not a conflict. The brief assigns "metadata carry-over" to the Codec; the
+  reconstruction split metadata between Codec (bitstream and container) and Replacer
+  (file-level tags). app-architecture §6 step 1 already assigns file-level tags to the
+  Replacer, so both hold: the codec carries what it can, and the split stands.
+- D10.6 — Addition, retained. The requirement that any quality-index-to-rate-control mapping
+  preserve monotonicity is strictly stronger than the brief's "adapt the Searcher's parameter
+  accordingly", and is what makes the binary search sound (D4.3).
+
+### M4
+
+- D10.7 — **Conflict, original wins.** The brief specifies a CSV of exactly
+  `(clip, setting, xpsnr, vmaf)` — four columns. The reconstruction's `spec.md` §12.1 proposed
+  five, adding `device`. Reverted to four. Device identity belongs in the file name or a
+  header line, not a column, so that two devices' results remain distinguishable without
+  contradicting the brief.
+- D10.8 — Addition, retained. The brief says the harness derives "the XPSNR threshold for
+  VMAF 95" — one target. The reconstruction generalises to any target the user can select,
+  which is a superset and is required by the three quality settings in `spec.md` §5.
+- D10.9 — Addition, retained. Extending guard #1a to C and C++ sources is not in the brief.
+  It is required by CLAUDE.md's no-network invariant once `native/` exists, since all three
+  guards currently scan `*.kt` only and would leave the native layer unpoliced.
+
+### M5
+
+- D10.10 — **Conflict between the brief and a source document; document wins, flagged.** The
+  brief lists six screens — Hub, InstantCompress, Folders, History, Settings, ShareEntry —
+  and omits **BigFiles**, which `frontend-architecture.md` §5 documents as "full list with
+  filters, multi-select, running total". Safest reading taken: build BigFiles. Omitting it
+  leaves the Hub's list unreachable in full, and §5 marks it as inheriting Hub's states, so
+  it is cheap. This is the one place in the run where a source document was preferred over
+  the brief; it is flagged in `HANDOFF.md` for the human rather than settled by me.
+- D10.11 — Addition, retained. The brief says "screenshot tests in light and dark"; the
+  reconstruction adds large font scales, per frontend-architecture §11.
+- D10.12 — Elaboration only. The brief says "fake use cases"; the reconstruction names the
+  module `core/domain-test`, which is where D8.7 already deferred them to.
+
+### M6
+
+- D10.13 — **The playbook has no Milestone 6.** `docs/M6-PROMPT.md` was derived from
+  app-architecture §11 and §12, and the human's rule for this run forbids inventing
+  milestones beyond the documents. M6 is therefore **demoted**: it is a derived release
+  checklist, not a document milestone, and the final milestone of this run is M5. The file is
+  retained under that description because §11's two release gates are real requirements; it
+  is simply not a milestone anyone specified.

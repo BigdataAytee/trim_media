@@ -88,8 +88,12 @@ wired into `check`. Read docs/M2-STATUS.md before starting.
    - Android 14 requires a foreground service type. Pick one, and record which and why in
      DECISIONS — it is a store-review-visible choice.
 
-5. Guard #1b — the merged manifest. guardNoNetworkManifest is a loudly-failing stub in
-   buildLogic/src/main/kotlin/trim.guards.gradle.kts. Implement it for real:
+5. Guard #1 — the merged manifest. THIS is what the original brief means by guard #1:
+   "no-network on the merged manifest of every variant" (DECISIONS D10.1). The already-live
+   guardNoNetworkSources is an extra and does NOT satisfy this milestone; do not mistake a
+   green source scan for a discharged requirement. guardNoNetworkManifest is a
+   loudly-failing stub in buildLogic/src/main/kotlin/trim.guards.gradle.kts. Implement it
+   for real:
 
    - Check the MERGED manifest of every variant, not the source manifest. §8 notes this
      guard "already caught a third-party dependency silently contributing the permission",

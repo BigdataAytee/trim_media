@@ -83,6 +83,12 @@ to question.
 
    Hub · InstantCompress · BigFiles · Folders · History · Settings · ShareEntry
 
+   Note on BigFiles: the original brief lists six screens and omits it, while
+   frontend-architecture §5 documents it. The document was preferred, because omitting it
+   leaves the Hub's list unreachable in full and §5 marks it as inheriting Hub's states
+   (DECISIONS D10.10). This is the one place in the run where a source document was
+   preferred over the brief — if you disagree, this is the screen to cut.
+
    Rules from §5 that are easy to lose and expensive to lose:
    - Hub sorts by estimated saving descending, and the top three rows should carry about
      half the promised total. The database query already sorts this way and the end-to-end

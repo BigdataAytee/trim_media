@@ -77,11 +77,11 @@ the assumptions the pipeline was built on — before a user's file does.
    waits, and resumes the file from its last sync point". Those are not the same thing,
    and on a 4K file the difference is minutes of wasted hardware per reclaim.
 
-   Closing it needs a port change — encodeFull taking a resume point, and the codec
-   producing an output that can be appended to or muxed from a sync point. Come to me with
-   a proposal before you make it. If you conclude that restarting is the right trade for
-   short files and resuming only pays above some duration, that is a fine answer; it is
-   just not one to make silently.
+   The original brief settles this: it requires "KEY_PRIORITY=1 with catch-wait-resume on
+   codec reclaim" (DECISIONS D10.4). Restarting is therefore a defect, not a trade to
+   evaluate. Implement resume from the last sync point: encodeFull takes a resume point, and
+   the codec produces output that can be muxed from one. The port change that requires is
+   required, not optional — make it, and log it.
 
 5. Colour range and metadata.
 
