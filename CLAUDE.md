@@ -51,10 +51,10 @@ human when documents conflict.
   the history of a safety-relevant change.
 
 ## Milestones
-- **M1 (current)** — platform-free core: `core/model`, `core/ports` (+ fakes),
+- **M1 (done)** — platform-free core: `core/model`, `core/ports` (+ fakes),
   `core/pipeline`, `core/data`, `core/domain`, `buildLogic`. No Android,
   Compose, MediaCodec or JNI code. `./gradlew check` must pass on a machine
-  with no Android SDK.
+  with no Android SDK. Kickoff prompt, as issued: `docs/M1-PROMPT.md`.
 - **M2 (in progress)** — `androidApp` + real MediaInfo/Storage/Scheduler ports, guards #1
   and #2. Done so far: `core/ports-contract` (one shared suite per port, passing against
   every fake), guard #1a (`guardNoNetworkSources`) and guard #2

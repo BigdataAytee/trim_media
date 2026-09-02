@@ -54,6 +54,9 @@ see `CLAUDE.md`.
 3. `docs/frontend-architecture.md` — the UI layer and the honest types.
 4. `docs/GUARDS.md` — the build-enforced invariants, and the evidence they are alive.
 5. `docs/DECISIONS.md` — every judgment call made where the documents were silent.
+6. `docs/M1-PROMPT.md` … `docs/M6-PROMPT.md` — one kickoff prompt per milestone. M1's is
+   the prompt as it was issued, with the eight places the result diverged from it recorded
+   underneath; the rest are instructions still to be run.
 
 ## Where the build is now
 
