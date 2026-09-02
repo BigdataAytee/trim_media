@@ -53,12 +53,38 @@ showing this state.
 
 **Ready.** The main state.
 
-- Headline card: **"You can free about 12.4 GB"** — the estimate is a range and the word
-  "about" is not optional.
-- Below it: **"from 23 videos"**, and a secondary line naming the largest single saving,
-  e.g. "the biggest is Beach day, about 380 MB".
-- Primary action: **Compress all tonight**
-- Secondary action: **Compress selected now** (enabled only with a selection)
+- Headline card:
+
+  > **You can free up about 12 GB**
+  > from 23 videos that use 36.2 GB now
+
+  A saving is only meaningful against what it is a saving *from*: 12 GB out of 15 GB is
+  transformative and out of 400 GB is noise, and a headline that gives only the first number
+  cannot be judged. §7.3 requires savings to show both size and percent; the base figure is
+  a stronger form of the same honesty than a bare percentage, and it is the reading this
+  screen takes.
+
+  **The number's precision tracks the estimate's confidence.** `EstimateRange` carries a
+  confidence, and the headline is the one place in the app where over-precision does real
+  damage — a decimal place reads as a measurement. So:
+
+  | Confidence | Band | Rendered |
+  |---|---|---|
+  | Probed | ±4.5% | "about 12.4 GB" |
+  | Predicted | ±9% | "about 12 GB" |
+  | Seed | ±18% | "about 12 GB" |
+
+  Before any probe has run the true range is roughly 10–15 GB, and "12.4" is fiction that
+  the word "about" is not strong enough to carry. Rounding is how a careful person quotes an
+  uncertain number, and it costs the user nothing.
+
+  There is no third line. Naming the largest single saving would only repeat the first row
+  of the list immediately below.
+
+- Primary action: **Compress all tonight** — or **Compress all now** when the nightly run is
+  switched off in Settings, because otherwise the button names a thing that will not happen.
+- Secondary action: **Compress selected now** (enabled only with a selection). One primary
+  action per screen (§7.2); "compress all" is it.
 - The shrinkable list, sorted by estimated saving descending. The top three rows should
   carry roughly half the promised total; if they do not, the estimate model is wrong and
   the Hub will feel like it is padding.
@@ -302,8 +328,9 @@ Everything not marked **‹coded›**. That is nearly all the copy, so rather th
 by line, here is what to review first, in order of consequence:
 
 1. **The headline card's phrasing** (§1). It is the first thing anyone sees and it sets
-   whether the app reads as confident or as hedging. "You can free about 12.4 GB" is one
-   choice among many.
+   whether the app reads as confident or as hedging. It has been through one deliberate
+   rewrite; the confidence-driven rounding rule it now carries is a product decision that
+   needs agreeing, not just wording.
 2. **The three original-handling option descriptions** (§4). These are how a user decides
    whether to let an app delete their videos. The delete-immediately warning itself has
    been through one deliberate rewrite — see `spec.md` §8.2, which now carries the three
