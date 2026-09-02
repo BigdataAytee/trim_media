@@ -69,6 +69,11 @@ human when documents conflict.
   `docs/M4-PROMPT.md`.
 - M5 — UI per `docs/frontend-architecture.md` and `docs/screens.md`. Kickoff prompt:
   `docs/M5-PROMPT.md` — **blocked**: `docs/screens.md` has never been supplied.
+- M6 — release preparation: the §11 release gates, the guards on the release variant, and
+  the three things the documents promise but the code has never built (the diagnostics
+  export, schema migrations, licence notices). Kickoff prompt: `docs/M6-PROMPT.md`.
+  Derived from §11 and §12 rather than from the original kickoff document, which stops
+  at M5.
 
 ## Tooling
 Claude Code plugins for this repo are declared in `.claude/settings.json`;
