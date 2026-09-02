@@ -15,5 +15,8 @@ kotlin {
             implementation(project(":core:ports-fake"))
             implementation(libs.kotlinx.coroutines.test)
         }
+        jvmTest.dependencies {
+            implementation(libs.sqldelight.driver.jvm)
+        }
     }
 }

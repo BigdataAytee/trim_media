@@ -69,3 +69,13 @@ correction by the human — it is a log of judgment calls, not of agreed policy.
 - D7.1 — Guard #3 (storage writes only in `Replacer`) is implemented as a Gradle verification task that parses every Kotlin source set for references to the write-capable `Storage` members, which are annotated `@StorageWrite` in `core/ports` so the guard has an authoritative list rather than a hand-maintained one.
 - D7.2 — Every guard fails when it finds **nothing to scan** (app-architecture §8), so an empty source set or a renamed module can never make a guard silently pass.
 - D7.3 — Guards #1 (no network) and #2 (codecs only via `CodecFactory`) are registered now as tasks that fail loudly with a `TODO(M2)` message, so `./gradlew check` does not run them but any attempt to rely on them is impossible to miss.
+
+## D8 — Domain and the assembled pipeline
+
+- D8.1 — `Restorer` lives in `dev.trim.pipeline.replace` alongside the `Replacer`, not in `core/domain`, because restoring writes to user storage and app-architecture §6 calls it the Replacer's mirror image. The build guard's allow-list is therefore a package rather than a class.
+- D8.2 — A restore is refused when the compressed file's fingerprint no longer matches the one recorded at commit (§6, "refuses to run if the compressed file has since been edited by another app"). On a failure to move the original back, the undo entry is deliberately **not** forgotten: the original is still in the bin and forgetting the row would strand it.
+- D8.3 — `ScanAndTriage` writes rows and returns a report; it never hands a candidate list to a caller, because §4.1 says the hub renders the database rather than asking the pipeline.
+- D8.4 — A **skip is not a processing**: only a completed compression enters the processed list, so a file skipped as HDR or too noisy is offered again on the next scan. The user may change the quality target, and a future release may handle HDR; a skip records a decision, not a permanent fact. The end-to-end test asserts both halves.
+- D8.5 — `RunQueue` records the history or skipped row **before** it reports the outcome to its caller, so a process killed immediately after a job still leaves a consistent database.
+- D8.6 — The end-to-end test's expected-outcome table is written out in full and compared with `assertEquals` on the whole map rather than per-file assertions, so a threshold change in `PipelineConfig` fails one readable assertion instead of silently shifting a category.
+- D8.7 — Milestone 1 ships no `core/domain-test` fakes for the §8 contract interfaces; the end-to-end test exercises the real implementations over fake ports instead. The ViewModel-facing fakes arrive with M5, which is what needs them.
