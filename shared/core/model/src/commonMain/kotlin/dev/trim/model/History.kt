@@ -17,12 +17,16 @@ public data class HistoryEntry(
     public val savedBytes: Long get() = originalBytes - compressedBytes
 }
 
-/** A rejection, as History's skipped list renders it. */
+/**
+ * A rejection, as History's skipped list renders it. The reason is a [RejectionReason] and
+ * not only a [SkipReason], because app-architecture §10 puts file-level failures in the
+ * same list.
+ */
 public data class SkippedEntry(
     val videoId: VideoId,
     val displayName: String,
     val recordedAtEpochMs: Long,
-    val reason: SkipReason,
+    val reason: RejectionReason,
 )
 
 /**

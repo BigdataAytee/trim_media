@@ -1,0 +1,51 @@
+-- The queue. Claims are transactional so a killed process never double-runs a file
+-- (app-architecture §4.1).
+CREATE TABLE jobs (
+    id                  TEXT    NOT NULL PRIMARY KEY,
+    video_ref           TEXT    NOT NULL,
+    trigger_kind        TEXT    NOT NULL,
+    state               TEXT    NOT NULL,
+    queued_at_epoch_ms  INTEGER NOT NULL,
+    claimed_at_epoch_ms INTEGER,
+    claim_token         TEXT,
+    -- The model's invariant, restated where the rows live: RUNNING exactly when claimed.
+    CHECK ((state = 'RUNNING') = (claim_token IS NOT NULL))
+);
+
+CREATE UNIQUE INDEX jobs_video_pending ON jobs(video_ref) WHERE state IN ('QUEUED', 'RUNNING');
+
+enqueue:
+INSERT OR IGNORE INTO jobs VALUES ?;
+
+selectQueued:
+SELECT * FROM jobs WHERE state = 'QUEUED' ORDER BY queued_at_epoch_ms ASC;
+
+selectRunning:
+SELECT * FROM jobs WHERE state = 'RUNNING';
+
+selectById:
+SELECT * FROM jobs WHERE id = ?;
+
+-- The claim: only a QUEUED row can be taken, and taking it is one statement, so two
+-- processes racing produce one winner and one no-op rather than two encodes of one file.
+claim:
+UPDATE jobs
+SET state = 'RUNNING', claimed_at_epoch_ms = ?, claim_token = ?
+WHERE id = ? AND state = 'QUEUED';
+
+release:
+UPDATE jobs SET state = 'QUEUED', claimed_at_epoch_ms = NULL, claim_token = NULL
+WHERE id = ? AND state = 'RUNNING';
+
+finish:
+UPDATE jobs SET state = ?, claimed_at_epoch_ms = NULL, claim_token = NULL WHERE id = ?;
+
+releaseStaleClaims:
+UPDATE jobs SET state = 'QUEUED', claimed_at_epoch_ms = NULL, claim_token = NULL
+WHERE state = 'RUNNING' AND (claim_token != ? OR claimed_at_epoch_ms < ?);
+
+changes:
+SELECT changes();
+
+deleteAll:
+DELETE FROM jobs;

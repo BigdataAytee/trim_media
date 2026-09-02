@@ -1,0 +1,32 @@
+-- Rows first, files second. The undo bin is reconciled against this table on every start
+-- and orphans on either side are repaired (app-architecture §4.1).
+CREATE TABLE undo_entries (
+    video_ref             TEXT    NOT NULL PRIMARY KEY,
+    original_ref          TEXT    NOT NULL,
+    bin_ref               TEXT    NOT NULL,
+    compressed_ref        TEXT    NOT NULL,
+    compressed_size       INTEGER NOT NULL,
+    compressed_modified   INTEGER NOT NULL,
+    compressed_hash       TEXT    NOT NULL,
+    created_at_epoch_ms   INTEGER NOT NULL,
+    expires_at_epoch_ms   INTEGER,
+    CHECK (expires_at_epoch_ms IS NULL OR expires_at_epoch_ms > created_at_epoch_ms)
+);
+
+record:
+INSERT OR REPLACE INTO undo_entries VALUES ?;
+
+selectAll:
+SELECT * FROM undo_entries ORDER BY created_at_epoch_ms DESC;
+
+selectByRef:
+SELECT * FROM undo_entries WHERE video_ref = ?;
+
+selectExpired:
+SELECT * FROM undo_entries WHERE expires_at_epoch_ms IS NOT NULL AND expires_at_epoch_ms <= ?;
+
+forget:
+DELETE FROM undo_entries WHERE video_ref = ?;
+
+changes:
+SELECT changes();

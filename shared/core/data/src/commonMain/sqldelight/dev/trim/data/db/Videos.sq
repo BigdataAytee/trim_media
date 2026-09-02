@@ -1,0 +1,43 @@
+-- Files the scanner has seen. The row is the projection the UI renders; the file itself
+-- is never read by anything above the pipeline (app-architecture §4.1).
+CREATE TABLE videos (
+    ref                   TEXT    NOT NULL PRIMARY KEY,
+    folder_id             TEXT    NOT NULL,
+    display_name          TEXT    NOT NULL,
+    size_bytes            INTEGER NOT NULL,
+    duration_ms           INTEGER NOT NULL,
+    width                 INTEGER NOT NULL,
+    height                INTEGER NOT NULL,
+    frame_rate            REAL    NOT NULL,
+    codec                 TEXT    NOT NULL,
+    bitrate_bps           INTEGER NOT NULL,
+    transfer              TEXT    NOT NULL,
+    color_range           TEXT    NOT NULL,
+    bit_depth             INTEGER NOT NULL,
+    video_track_count     INTEGER NOT NULL,
+    audio_track_count     INTEGER NOT NULL,
+    other_track_count     INTEGER NOT NULL,
+    date_taken_epoch_ms   INTEGER,
+    last_modified_epoch_ms INTEGER NOT NULL,
+    fingerprint_size      INTEGER NOT NULL,
+    fingerprint_modified  INTEGER NOT NULL,
+    fingerprint_hash      TEXT    NOT NULL,
+    scanned_at_epoch_ms   INTEGER NOT NULL
+);
+
+CREATE INDEX videos_folder ON videos(folder_id);
+
+upsert:
+INSERT OR REPLACE INTO videos VALUES ?;
+
+selectAll:
+SELECT * FROM videos;
+
+selectByRef:
+SELECT * FROM videos WHERE ref = ?;
+
+deleteByRef:
+DELETE FROM videos WHERE ref = ?;
+
+deleteAll:
+DELETE FROM videos;

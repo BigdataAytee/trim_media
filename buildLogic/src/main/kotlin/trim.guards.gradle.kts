@@ -13,12 +13,18 @@ val guardStorageWrites = tasks.register<StorageWriteGuardTask>("guardStorageWrit
 
     annotationName.set("StorageWrite")
 
+    // Source directories only, never a tree rooted above a module's `build/`: a guard whose
+    // inputs overlap another task's outputs is a guard Gradle has to serialise around.
     portSources.from(
         repoRoot.dir("shared/core/ports/src").asFileTree.matching { include("**/*.kt") }
     )
     scannedSources.from(
-        repoRoot.dir("shared").asFileTree.matching {
-            include("**/src/*Main/kotlin/**/*.kt")
+        // Derived from the modules the build actually has, so a module added later is
+        // policed automatically rather than quietly exempt.
+        subprojects.map { module ->
+            module.layout.projectDirectory.dir("src").asFileTree.matching {
+                include("**/*Main/kotlin/**/*.kt")
+            }
         }
     )
     allowedPathFragments.set(

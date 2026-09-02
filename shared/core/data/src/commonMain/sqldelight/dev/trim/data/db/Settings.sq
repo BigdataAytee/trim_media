@@ -1,0 +1,37 @@
+-- Per-folder original handling, and the single settings row.
+CREATE TABLE folder_modes (
+    folder_id           TEXT    NOT NULL PRIMARY KEY,
+    fate_kind           TEXT    NOT NULL,
+    fate_detail         TEXT,
+    include_in_nightly  INTEGER NOT NULL,
+    delete_confirmed    INTEGER NOT NULL
+);
+
+CREATE TABLE settings (
+    id                     INTEGER NOT NULL PRIMARY KEY,
+    quality_target         TEXT    NOT NULL,
+    nightly_enabled        INTEGER NOT NULL,
+    require_full_charge    INTEGER NOT NULL,
+    stop_before_alarm      INTEGER NOT NULL,
+    nightly_byte_cap       INTEGER,
+    work_while_using_phone INTEGER NOT NULL,
+    default_fate_kind      TEXT    NOT NULL,
+    default_fate_detail    TEXT,
+    CHECK (id = 0),
+    CHECK (nightly_byte_cap IS NULL OR nightly_byte_cap > 0)
+);
+
+upsertFolderMode:
+INSERT OR REPLACE INTO folder_modes VALUES ?;
+
+selectFolderModes:
+SELECT * FROM folder_modes;
+
+selectFolderMode:
+SELECT * FROM folder_modes WHERE folder_id = ?;
+
+upsertSettings:
+INSERT OR REPLACE INTO settings VALUES ?;
+
+selectSettings:
+SELECT * FROM settings WHERE id = 0;

@@ -1,0 +1,26 @@
+-- (device, camera, codec, res, fps, bitrate-bucket) -> setting, plus what it cost. Also
+-- what makes hub estimates instant (app-architecture §3).
+CREATE TABLE predictor (
+    device_class    TEXT    NOT NULL,
+    camera_tag      TEXT    NOT NULL,
+    codec           TEXT    NOT NULL,
+    width_bucket    INTEGER NOT NULL,
+    fps_bucket      INTEGER NOT NULL,
+    bitrate_bucket  INTEGER NOT NULL,
+    quality_sum     INTEGER NOT NULL,
+    fraction_sum    REAL    NOT NULL,
+    observations    INTEGER NOT NULL,
+    is_seed         INTEGER NOT NULL,
+    PRIMARY KEY (device_class, camera_tag, codec, width_bucket, fps_bucket, bitrate_bucket)
+);
+
+select:
+SELECT * FROM predictor
+WHERE device_class = ? AND camera_tag = ? AND codec = ?
+  AND width_bucket = ? AND fps_bucket = ? AND bitrate_bucket = ?;
+
+upsert:
+INSERT OR REPLACE INTO predictor VALUES ?;
+
+selectAll:
+SELECT * FROM predictor;

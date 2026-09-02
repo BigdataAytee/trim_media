@@ -1,0 +1,48 @@
+-- What triage decided, for every video it judged. Both outcomes are stored: the hub's
+-- "can't be shrunk" list is as much a projection of this table as the shrinkable list is,
+-- and a rejection without a reason cannot be written because reason_type is NOT NULL.
+CREATE TABLE candidates (
+    video_ref          TEXT    NOT NULL PRIMARY KEY,
+    is_candidate       INTEGER NOT NULL,
+    estimate_low       INTEGER,
+    estimate_high      INTEGER,
+    estimate_confidence TEXT,
+    bracket_safest     INTEGER,
+    bracket_aggressive INTEGER,
+    predicted_quality  INTEGER,
+    reason_type        TEXT,
+    reason_detail      TEXT,
+    judged_at_epoch_ms INTEGER NOT NULL,
+    -- A candidate carries an estimate and a bracket; a rejection carries a reason. Neither
+    -- shape can be written as the other.
+    CHECK (
+        (is_candidate = 1
+            AND estimate_low IS NOT NULL AND estimate_high IS NOT NULL
+            AND estimate_confidence IS NOT NULL
+            AND bracket_safest IS NOT NULL AND bracket_aggressive IS NOT NULL
+            AND reason_type IS NULL)
+        OR
+        (is_candidate = 0 AND reason_type IS NOT NULL)
+    ),
+    FOREIGN KEY (video_ref) REFERENCES videos(ref) ON DELETE CASCADE
+);
+
+CREATE INDEX candidates_is_candidate ON candidates(is_candidate);
+
+upsert:
+INSERT OR REPLACE INTO candidates VALUES ?;
+
+selectShrinkable:
+SELECT c.*, v.display_name, v.size_bytes
+FROM candidates c JOIN videos v ON v.ref = c.video_ref
+WHERE c.is_candidate = 1
+ORDER BY (v.size_bytes - c.estimate_high) DESC;
+
+selectNotShrinkable:
+SELECT c.*, v.display_name, v.size_bytes
+FROM candidates c JOIN videos v ON v.ref = c.video_ref
+WHERE c.is_candidate = 0
+ORDER BY v.size_bytes DESC;
+
+deleteByRef:
+DELETE FROM candidates WHERE video_ref = ?;

@@ -1,0 +1,42 @@
+-- Completed work, and the processed list that makes re-processing structurally impossible
+-- (app-architecture §12: the processed list is a hard gate, not warning copy).
+CREATE TABLE history (
+    video_ref               TEXT    NOT NULL PRIMARY KEY,
+    display_name            TEXT    NOT NULL,
+    completed_at_epoch_ms   INTEGER NOT NULL,
+    original_bytes          INTEGER NOT NULL,
+    compressed_bytes        INTEGER NOT NULL,
+    fate_kind               TEXT    NOT NULL,
+    fate_detail             TEXT,
+    restorable_until_epoch_ms INTEGER,
+    CHECK (compressed_bytes < original_bytes)
+);
+
+CREATE TABLE skipped (
+    video_ref          TEXT    NOT NULL PRIMARY KEY,
+    display_name       TEXT    NOT NULL,
+    recorded_at_epoch_ms INTEGER NOT NULL,
+    reason_type        TEXT    NOT NULL,
+    reason_detail      TEXT    NOT NULL
+);
+
+recordCompleted:
+INSERT OR REPLACE INTO history VALUES ?;
+
+recordSkipped:
+INSERT OR REPLACE INTO skipped VALUES ?;
+
+selectHistory:
+SELECT * FROM history ORDER BY completed_at_epoch_ms DESC;
+
+selectSkipped:
+SELECT * FROM skipped ORDER BY recorded_at_epoch_ms DESC;
+
+lifetimeSaved:
+SELECT COALESCE(SUM(original_bytes - compressed_bytes), 0) AS saved FROM history;
+
+isProcessed:
+SELECT EXISTS(SELECT 1 FROM history WHERE video_ref = ?) AS processed;
+
+deleteHistory:
+DELETE FROM history WHERE video_ref = ?;
