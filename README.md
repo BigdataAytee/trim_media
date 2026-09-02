@@ -65,6 +65,12 @@ environment with access to the Android SDK. `docs/M2-STATUS.md` is the handoff;
 ## Missing documents
 
 `docs/spec.md` and `docs/screens.md` are named as sources of truth by `CLAUDE.md` but have
-not been supplied to the repo. Nothing in Milestone 1 depended on them; everywhere a value
-would normally have come from the spec, a default was chosen and recorded in
-`docs/DECISIONS.md` under D0 and D3. They are needed before Milestone 5.
+not been supplied to the repo. Nothing in Milestones 1–3 depended on them; everywhere a
+value would normally have come from the spec, a default was chosen and recorded in
+`docs/DECISIONS.md` under D0 and D3.
+
+They become blocking later. Milestone 4's calibration harness is specified in `spec.md`
+§12.1, and enough of it can be rebuilt from `app-architecture.md` §9 and §11 that the
+milestone can proceed with its choices recorded. **Milestone 5 cannot.** `screens.md` is
+the only source for what each screen contains, and starting without it produces an
+invented UI rather than a partial one — see `docs/M5-PROMPT.md`.
