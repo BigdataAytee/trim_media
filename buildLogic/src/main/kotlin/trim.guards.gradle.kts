@@ -69,8 +69,29 @@ val guardNoNetworkSources = tasks.register<BannedImportGuardTask>("guardNoNetwor
             "java.net",
             "javax.net",
             "java.rmi",
-            // Android
-            "android.net",
+            // Android. NOT the whole `android.net` package: android.net.Uri is a URI
+            // parser, not a networking API, and SAF is built on it — banning the package
+            // wholesale would block the Storage port and invite someone to exempt
+            // `android.net` entirely, which would silently un-police every Android source
+            // file. The networking classes are therefore named one by one.
+            "android.net.ConnectivityManager",
+            "android.net.Network",
+            "android.net.NetworkCapabilities",
+            "android.net.NetworkInfo",
+            "android.net.NetworkRequest",
+            "android.net.LinkProperties",
+            "android.net.DnsResolver",
+            "android.net.LocalSocket",
+            "android.net.LocalServerSocket",
+            "android.net.TrafficStats",
+            "android.net.VpnService",
+            "android.net.Proxy",
+            "android.net.SSLCertificateSocketFactory",
+            "android.net.wifi",
+            "android.net.sip",
+            "android.net.http",
+            "android.net.rtp",
+            "android.net.nsd",
             "android.webkit",
             // Kotlin / JetBrains
             "io.ktor",

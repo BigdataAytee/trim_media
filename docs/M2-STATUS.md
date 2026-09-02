@@ -6,6 +6,9 @@ the half that does is blocked on the environment, not on any decision.
 Run `tools/preflight-android.sh` first. It answers in one command whether the machine you
 are on can build the Android half, and names the blocker if not.
 
+`docs/M2-PROMPT.md` turns the "left to build" section below into a kickoff prompt to paste
+into Claude Code.
+
 ---
 
 ## Done, and verified

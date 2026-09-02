@@ -114,6 +114,16 @@ Execution failed for task ':guardNoNetworkSources'.
 Note line 10: the guard bans bare symbols as well as imports, so a fully-qualified
 reference that never appears in an import statement is caught too.
 
+### `android.net` is banned class by class, not as a package
+
+`android.net.Uri` is a URI parser, not a networking API, and SAF is built on it — the
+Storage port cannot be written without it. Banning the package wholesale would block
+Milestone 2 and invite whoever hit it to exempt `android.net` entirely, which would
+silently stop policing every Android source file. The networking classes in that package
+are therefore named one by one (`ConnectivityManager`, `Network`, `NetworkCapabilities`,
+`wifi`, `http`, …). Verified both ways: a file importing `android.net.Uri` passes, and the
+same file importing `android.net.ConnectivityManager` fails.
+
 **Failing when its ban list is emptied.** Someone "temporarily" clearing the list is the
 other way a guard dies:
 
